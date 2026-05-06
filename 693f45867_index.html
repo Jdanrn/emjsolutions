@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>EMJ Solutions LLC – Nurse Consultation Booking</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f4f8; color: #1a202c; }
+
+    header {
+      background: linear-gradient(135deg, #1a3a5c 0%, #2563a8 100%);
+      color: white; padding: 40px 20px 50px; text-align: center;
+    }
+    header .logo-line {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; margin-bottom: 10px;
+    }
+    header .logo-line svg { width: 40px; height: 40px; }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: 0.5px; }
+    header .tagline { font-size: 1.05rem; opacity: 0.88; margin-top: 6px; }
+    .specialty-badge {
+      display: inline-block; background: #e84545; color: white;
+      font-size: 0.78rem; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; padding: 4px 14px; border-radius: 20px; margin-top: 12px;
+    }
+
+    main { max-width: 860px; margin: -24px auto 40px; padding: 0 16px; }
+
+    .about-card {
+      background: white; border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+      padding: 32px 36px; margin-bottom: 28px;
+    }
+    .about-card h2 { font-size: 1.3rem; color: #1a3a5c; margin-bottom: 12px; }
+    .about-card p { line-height: 1.75; color: #4a5568; font-size: 0.97rem; }
+    .credentials { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .cred-badge {
+      background: #ebf4ff; color: #1a3a5c; font-size: 0.82rem; font-weight: 600;
+      padding: 5px 14px; border-radius: 20px; border: 1px solid #bfd6f6;
+    }
+
+    .section-title { font-size: 1.25rem; font-weight: 700; color: #1a3a5c; margin-bottom: 16px; }
+    .services-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px; margin-bottom: 28px;
+    }
+    .service-card {
+      background: white; border-radius: 12px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      padding: 22px 22px 20px; border-top: 4px solid #2563a8; transition: transform 0.15s;
+    }
+    .service-card:hover { transform: translateY(-3px); }
+    .service-card.cardiology { border-top-color: #e84545; }
+    .service-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .service-card h3 { font-size: 1rem; font-weight: 700; color: #1a202c; margin-bottom: 6px; }
+    .service-card p { font-size: 0.875rem; color: #718096; line-height: 1.6; }
+    .service-card .price { margin-top: 12px; font-weight: 700; font-size: 1rem; color: #2563a8; }
+    .service-card.cardiology .price { color: #e84545; }
+
+    .booking-card {
+      background: white; border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+      padding: 32px 36px; margin-bottom: 28px;
+    }
+    .booking-card h2 { font-size: 1.3rem; color: #1a3a5c; margin-bottom: 22px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 560px) {
+      .form-row { grid-template-columns: 1fr; }
+      .about-card, .booking-card { padding: 22px 18px; }
+    }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 0.85rem; font-weight: 600; color: #4a5568; }
+    input, select, textarea {
+      border: 1.5px solid #cbd5e0; border-radius: 8px; padding: 10px 13px;
+      font-size: 0.95rem; color: #1a202c; background: #f7fafc;
+      transition: border-color 0.2s; width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none; border-color: #2563a8; background: white;
+    }
+    textarea { min-height: 90px; resize: vertical; }
+
+    .submit-btn {
+      display: block; width: 100%;
+      background: linear-gradient(135deg, #1a3a5c, #2563a8);
+      color: white; border: none; border-radius: 10px;
+      padding: 14px; font-size: 1.05rem; font-weight: 700;
+      cursor: pointer; margin-top: 8px; letter-spacing: 0.3px; transition: opacity 0.2s;
+      position: relative;
+    }
+    .submit-btn:hover { opacity: 0.92; }
+    .submit-btn:disabled { opacity: 0.65; cursor: not-allowed; }
+
+    .spinner {
+      display: inline-block; width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .success-msg {
+      display: none; background: #f0fff4; border: 1.5px solid #68d391;
+      color: #276749; border-radius: 10px; padding: 22px 24px;
+      font-size: 0.97rem; margin-top: 16px; line-height: 1.7;
+    }
+    .success-msg .pay-btn {
+      display: inline-block; background: #e84545; color: white;
+      padding: 13px 28px; border-radius: 8px; text-decoration: none;
+      font-weight: 700; margin-top: 14px; font-size: 1rem;
+    }
+
+    .error-msg {
+      display: none; background: #fff5f5; border: 1.5px solid #fc8181;
+      color: #c53030; border-radius: 10px; padding: 14px 18px;
+      font-size: 0.92rem; margin-top: 12px;
+    }
+
+    .disclaimer {
+      background: #fffbeb; border: 1px solid #f6d860;
+      border-radius: 10px; padding: 14px 18px;
+      font-size: 0.82rem; color: #7c5e10; line-height: 1.6; margin-bottom: 28px;
+    }
+
+    footer { text-align: center; padding: 24px; font-size: 0.82rem; color: #a0aec0; }
+    footer a { color: #2563a8; text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-line">
+    <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="20" r="20" fill="rgba(255,255,255,0.15)"/>
+      <path d="M20 28s-9-5.5-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-9 12-9 12z" fill="#e84545"/>
+      <circle cx="27" cy="27" r="4" fill="none" stroke="white" stroke-width="1.5"/>
+      <path d="M23 27 Q20 27 20 24" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    </svg>
+    <h1>EMJ Solutions LLC</h1>
+  </div>
+  <p class="tagline">Expert Nurse Consultation for Patients & Caregivers</p>
+  <span class="specialty-badge">❤️ Cardiology Specialist</span>
+</header>
+
+<main>
+
+  <div class="about-card">
+    <h2>About Your Consultant</h2>
+    <p>
+      Welcome! I'm James, a Registered Nurse with over <strong>22 years of clinical experience</strong>.
+      I provide compassionate, expert guidance to patients and caregivers navigating complex health conditions —
+      from understanding diagnoses and medications to coordinating care and preparing for doctor visits.
+      Whether your concern is cardiac health or another medical condition, I'm here to help you feel informed and empowered.
+    </p>
+    <div class="credentials">
+      <span class="cred-badge">🩺 Registered Nurse (RN)</span>
+      <span class="cred-badge">❤️ Cardiology Specialist</span>
+      <span class="cred-badge">22+ Years Experience</span>
+      <span class="cred-badge">Telehealth Available</span>
+    </div>
+  </div>
+
+  <p class="section-title">Consultation Services</p>
+  <div class="services-grid">
+    <div class="service-card cardiology">
+      <div class="icon">❤️</div>
+      <h3>Cardiac Health Consultation</h3>
+      <p>In-depth guidance for heart disease, AFib, heart failure, post-MI recovery, hypertension, and cardiac medications.</p>
+      <div class="price">$125 / session (60 min)</div>
+    </div>
+    <div class="service-card">
+      <div class="icon">📋</div>
+      <h3>Diagnosis & Care Navigation</h3>
+      <p>Help understanding a new or complex diagnosis, treatment options, test results, and what questions to ask your doctor.</p>
+      <div class="price">$100 / session (60 min)</div>
+    </div>
+    <div class="service-card">
+      <div class="icon">💊</div>
+      <h3>Medication Review</h3>
+      <p>Review of your current medications, potential interactions, side effects, and tips for medication adherence.</p>
+      <div class="price">$85 / session (45 min)</div>
+    </div>
+    <div class="service-card">
+      <div class="icon">🧑‍🤝‍🧑</div>
+      <h3>Caregiver Support</h3>
+      <p>Practical education and emotional support for family caregivers managing a loved one's health condition.</p>
+      <div class="price">$100 / session (60 min)</div>
+    </div>
+    <div class="service-card">
+      <div class="icon">🏥</div>
+      <h3>Hospital Discharge Planning</h3>
+      <p>Guidance on post-discharge care, follow-up appointments, activity restrictions, and warning signs to watch for.</p>
+      <div class="price">$100 / session (60 min)</div>
+    </div>
+    <div class="service-card">
+      <div class="icon">📞</div>
+      <h3>Quick Question (15 min)</h3>
+      <p>Got one specific question? Book a short focused session for fast, expert answers without a full consultation.</p>
+      <div class="price">$35 / session (15 min)</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ <strong>Important:</strong> Nurse consultations are for educational and informational purposes only and do not constitute medical advice, diagnosis, or treatment. Always consult your licensed physician or healthcare provider for medical decisions. In an emergency, call 911.
+  </div>
+
+  <div class="booking-card">
+    <h2>📅 Book Your Consultation</h2>
+    <form id="bookingForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="firstName">First Name *</label>
+          <input type="text" id="firstName" placeholder="Jane" required />
+        </div>
+        <div class="form-group">
+          <label for="lastName">Last Name *</label>
+          <input type="text" id="lastName" placeholder="Smith" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="email">Email Address *</label>
+          <input type="email" id="email" placeholder="jane@example.com" required />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" placeholder="(555) 123-4567" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="service">Service Type *</label>
+          <select id="service" required>
+            <option value="">— Select a service —</option>
+            <option value="cardiac">❤️ Cardiac Health Consultation – $125</option>
+            <option value="diagnosis">📋 Diagnosis & Care Navigation – $100</option>
+            <option value="medication">💊 Medication Review – $85</option>
+            <option value="caregiver">🧑‍🤝‍🧑 Caregiver Support – $100</option>
+            <option value="discharge">🏥 Hospital Discharge Planning – $100</option>
+            <option value="quick">📞 Quick Question (15 min) – $35</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="preferredDate">Preferred Date *</label>
+          <input type="date" id="preferredDate" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="preferredTime">Preferred Time *</label>
+          <select id="preferredTime" required>
+            <option value="">— Select a time —</option>
+            <option>9:00 AM</option>
+            <option>10:00 AM</option>
+            <option>11:00 AM</option>
+            <option>1:00 PM</option>
+            <option>2:00 PM</option>
+            <option>3:00 PM</option>
+            <option>4:00 PM</option>
+            <option>6:00 PM</option>
+            <option>7:00 PM</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="format">Consultation Format *</label>
+          <select id="format" required>
+            <option value="">— Select format —</option>
+            <option value="video">📹 Video Call (Zoom/Teams)</option>
+            <option value="phone">📞 Phone Call</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label for="concern">Brief Description of Your Concern *</label>
+          <textarea id="concern" placeholder="Please describe your health concern or what you'd like to discuss during the consultation..." required></textarea>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <label for="hearAbout">How did you hear about us?</label>
+          <select id="hearAbout">
+            <option value="">— Select one —</option>
+            <option>Google Search</option>
+            <option>Social Media</option>
+            <option>Friend / Family Referral</option>
+            <option>Healthcare Provider</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="error-msg" id="errorMsg"></div>
+      <button type="submit" class="submit-btn" id="submitBtn">Request My Consultation →</button>
+    </form>
+
+    <div class="success-msg" id="successMsg">
+      <strong>✅ Your consultation request has been submitted!</strong><br/>
+      James will reach out within 24 hours to confirm your appointment. Check your email for a confirmation.<br/>
+      <div id="paymentSection" style="display:none;">
+        <br/>To secure your spot, please complete payment:
+        <br/><a id="payNowBtn" href="#" class="pay-btn" target="_blank">💳 Pay Now</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  &copy; 2026 EMJ Solutions LLC &nbsp;|&nbsp; All Rights Reserved &nbsp;|&nbsp;
+  <a href="mailto:info@emjsolutions.com">info@emjsolutions.com</a>
+</footer>
+
+<script>
+  document.getElementById('preferredDate').min = new Date().toISOString().split('T')[0];
+
+  const FUNCTION_URL = 'https://base44.app/api/apps/69f9d79885cf9c9d4f6d5e1e/functions/submitBooking';
+
+  document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const btn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.style.display = 'none';
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Submitting…';
+
+    const payload = {
+      firstName: document.getElementById('firstName').value.trim(),
+      lastName:  document.getElementById('lastName').value.trim(),
+      email:     document.getElementById('email').value.trim(),
+      phone:     document.getElementById('phone').value.trim(),
+      service:   document.getElementById('service').value,
+      preferredDate: document.getElementById('preferredDate').value,
+      preferredTime: document.getElementById('preferredTime').value,
+      format:    document.getElementById('format').value,
+      concern:   document.getElementById('concern').value.trim(),
+      hearAbout: document.getElementById('hearAbout').value,
+    };
+
+    try {
+      const res = await fetch(FUNCTION_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.ok) {
+        throw new Error(data.error || 'Something went wrong. Please try again.');
+      }
+
+      // Show success
+      this.style.display = 'none';
+      const successDiv = document.getElementById('successMsg');
+      successDiv.style.display = 'block';
+
+      // Show pay button if URL returned
+      if (data.paymentUrl) {
+        document.getElementById('payNowBtn').href = data.paymentUrl;
+        document.getElementById('paymentSection').style.display = 'block';
+      }
+
+    } catch (err) {
+      errorMsg.textContent = '⚠️ ' + err.message;
+      errorMsg.style.display = 'block';
+      btn.disabled = false;
+      btn.innerHTML = 'Request My Consultation →';
+    }
+  });
+</script>
+
+</body>
+</html>
